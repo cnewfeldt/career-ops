@@ -5,14 +5,24 @@ Procesa URLs de ofertas acumuladas en `data/pipeline.md`. El usuario agrega URLs
 ## Workflow
 
 1. **Leer** `data/pipeline.md` → buscar items `- [ ]` en la sección "Pendientes"
-2. **Para cada URL pendiente**:
+2. **LIVENESS GATE (main session only -- runs BEFORE dispatching subagents)**:
+   Run `node check-liveness.mjs` on ALL pending URLs in the main session.
+   This MUST happen before any evaluation work begins.
+   ```bash
+   node check-liveness.mjs <url1> <url2> ... <urlN>
+   ```
+   - **active** → proceed to evaluation
+   - **expired** → mark as `- [!] {url} | {company} | {title} — Closed {date}` and skip
+   - **uncertain** → proceed but flag in report header as `**Verification:** uncertain`
+   Parse the output and remove expired URLs from the batch before step 3.
+3. **Para cada URL que pasó liveness check**:
    a. Calcular siguiente `REPORT_NUM` secuencial (leer `reports/`, tomar el número más alto + 1)
-   b. **Extraer JD** usando Playwright (browser_navigate + browser_snapshot) → WebFetch → WebSearch
+   b. **Extraer JD** usando WebFetch (subagents don't have Playwright) → WebSearch as fallback
    c. Si la URL no es accesible → marcar como `- [!]` con nota y continuar
    d. **Ejecutar auto-pipeline completo**: Evaluación A-F → Report .md → PDF (si score >= 3.0) → Tracker
    e. **Mover de "Pendientes" a "Procesadas"**: `- [x] #NNN | URL | Empresa | Rol | Score/5 | PDF ✅/❌`
-3. **Si hay 3+ URLs pendientes**, lanzar agentes en paralelo (Agent tool con `run_in_background`) para maximizar velocidad.
-4. **Al terminar**, mostrar tabla resumen:
+4. **Si hay 3+ URLs pendientes**, lanzar agentes en paralelo (Agent tool con `run_in_background`) para maximizar velocidad.
+5. **Al terminar**, mostrar tabla resumen:
 
 ```
 | # | Empresa | Rol | Score | PDF | Acción recomendada |
@@ -31,11 +41,19 @@ Procesa URLs de ofertas acumuladas en `data/pipeline.md`. El usuario agrega URLs
 - [x] #144 | https://boards.greenhouse.io/xyz/jobs/012 | BigCo | SA | 2.1/5 | PDF ❌
 ```
 
+## Playwright Constraint
+
+**Playwright browser tools (browser_navigate, browser_snapshot) are ONLY available in the main Claude Code session.**
+Subagents launched via `Agent()` do NOT have Playwright access. This means:
+- Liveness checks (`check-liveness.mjs`) must run in the main session BEFORE dispatching subagents
+- Subagents use WebFetch/WebSearch for JD extraction (works for most ATS pages)
+- The `/career-ops apply` mode should run in the main session (interactive form filling)
+
 ## Detección inteligente de JD desde URL
 
-1. **Playwright (preferido):** `browser_navigate` + `browser_snapshot`. Funciona con todas las SPAs.
-2. **WebFetch (fallback):** Para páginas estáticas o cuando Playwright no está disponible.
-3. **WebSearch (último recurso):** Buscar en portales secundarios que indexan el JD.
+1. **WebFetch (primary for subagents):** Works for most Greenhouse, Lever, Ashby pages.
+2. **WebSearch (fallback):** Search for the JD on secondary portals that index it.
+3. **Playwright (main session only):** `browser_navigate` + `browser_snapshot` for SPAs that WebFetch can't render.
 
 **Casos especiales:**
 - **LinkedIn**: Puede requerir login → marcar `[!]` y pedir al usuario que pegue el texto
