@@ -12,9 +12,21 @@ Procesa URLs de ofertas acumuladas en `data/pipeline.md`. El usuario agrega URLs
    node check-liveness.mjs <url1> <url2> ... <urlN>
    ```
    - **active** → proceed to evaluation
-   - **expired** → mark as `- [!] {url} | {company} | {title} — Closed {date}` and skip
+   - **expired** → run FALLBACK CHECK (step 2b), then mark as closed if still not found
    - **uncertain** → proceed but flag in report header as `**Verification:** uncertain`
    Parse the output and remove expired URLs from the batch before step 3.
+2b. **FALLBACK CHECK for expired URLs (main session only)**:
+   For each expired URL, check the company's own careers page for the same role:
+   ```bash
+   node check-fallback.mjs --company "{company}" --role "{role title}"
+   ```
+   Or batch via TSV file (tab-separated: url, company, role):
+   ```bash
+   node check-fallback.mjs --file expired.tsv
+   ```
+   - **found** → update the pipeline entry with the new URL and re-check liveness
+   - **not found** → mark as `- [!] {url} | {company} | {title} — Closed {date}` and skip
+   This catches roles that moved to a different ATS or are only listed on the company's own site.
 3. **Para cada URL que pasó liveness check**:
    a. Calcular siguiente `REPORT_NUM` secuencial (leer `reports/`, tomar el número más alto + 1)
    b. **Extraer JD** usando WebFetch (subagents don't have Playwright) → WebSearch as fallback
