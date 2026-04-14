@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.2] -- 2026-04-13
+
+### Features
+- Add `check-fallback.mjs`: when ATS URLs (Lever/Greenhouse/Ashby) return 404, checks the company's own careers page from portals.yml for the same role under a different URL
+- Integrate fallback checker as pipeline step 2b (runs after liveness gate, before marking as closed)
+
+### Upstream Sync
+- Merged upstream santifer/career-ops v1.4.0 (49 commits): dashboard progress analytics, vim motions, Catppuccin theme, batch --min-score flag, role matching improvements, CI/CD automations
+
 ## [1.0.1] -- 2026-04-08 (fork)
 
 ### Pipeline
