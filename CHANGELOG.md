@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.5.0](https://github.com/cnewfeldt/career-ops/compare/v1.4.0...v1.5.0) (2026-04-16)
+
+
+### Features
+
+* add --min-score flag to batch runner ([#249](https://github.com/cnewfeldt/career-ops/issues/249)) ([cb0c7f7](https://github.com/cnewfeldt/career-ops/commit/cb0c7f7d7d3b9f3f1c3dc75ccac0a08d2737c01e))
+* add careers page fallback checker for expired ATS URLs ([45486ec](https://github.com/cnewfeldt/career-ops/commit/45486ecc4620c34b078de77f748f89cfaf6caf30))
+* **dashboard:** add manual refresh shortcut ([#246](https://github.com/cnewfeldt/career-ops/issues/246)) ([4b5093a](https://github.com/cnewfeldt/career-ops/commit/4b5093a8ef1733c449ec0821f722f996625fcb84))
+
+
+### Bug Fixes
+
+* add stopword filtering and overlap ratio to roleMatch ([#248](https://github.com/cnewfeldt/career-ops/issues/248)) ([4da772d](https://github.com/cnewfeldt/career-ops/commit/4da772d3a4996bc9ecbe2d384d1e9d2ed75b9819))
+* ensure data/ and output/ dirs exist before writing in scripts ([#261](https://github.com/cnewfeldt/career-ops/issues/261)) ([4b834f6](https://github.com/cnewfeldt/career-ops/commit/4b834f6f7f8f1b647a6bf76e43b017dcbe9cd52f))
+
 ## [1.1.0] -- 2026-04-16
 
 ### Features
