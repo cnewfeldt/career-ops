@@ -5,6 +5,9 @@ interview-prep/story-bank.md
 data/applications.md
 data/pipeline.md
 data/scan-history.tsv
+data/*.png
+data/*.jpg
+data/*.jpeg
 reports/*.md
 !reports/.gitkeep
 output/*

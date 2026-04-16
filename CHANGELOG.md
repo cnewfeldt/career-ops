@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0] -- 2026-04-16
+
+### Features
+- Add `combine-pdf.mjs`: merge tailored cover letter + CV into a single PDF for application upload systems that only accept one file. Uses `pdfunite` (poppler) under the hood. Convention: cover letter first, CV second.
+
+### Docs
+- Gitignore `data/*.png` so personal signature images are excluded from system-layer commits (signatures live in `data/` and are embedded as base64 in generated cover letter HTML).
+
 ## [1.0.2] -- 2026-04-13
 
 ### Features
