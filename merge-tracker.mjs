@@ -291,10 +291,13 @@ if (tsvFiles.length === 0) {
   process.exit(0);
 }
 
-// Sort files numerically for deterministic processing
+// Sort files numerically for deterministic processing.
+// Use ONLY the leading numeric prefix — earlier `.replace(/\D/g, '')` would
+// also concatenate stray digits embedded in slugs (e.g. `091-cisdv-jp2-kindergarten.tsv`
+// became `0912`, breaking sort order and downstream maxNum allocation).
 tsvFiles.sort((a, b) => {
-  const numA = parseInt(a.replace(/\D/g, '')) || 0;
-  const numB = parseInt(b.replace(/\D/g, '')) || 0;
+  const numA = parseInt(a.match(/^\d+/)?.[0] ?? '0', 10);
+  const numB = parseInt(b.match(/^\d+/)?.[0] ?? '0', 10);
   return numA - numB;
 });
 
